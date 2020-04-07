@@ -47,3 +47,14 @@ steps:
   inputs:
     pathtoPublish: '$(Build.ArtifactStagingDirectory)' 
     artifactName: 'myWebsiteName'
+
+- task: PackerBuild@1
+  displayName: 'Build immutable image'
+  inputs:
+    ConnectedServiceName: 'Free Trial (2f72acfe-9510-43e3-aefe-055dea85635a)'
+    managedImageName: VMDisk
+    location: eastus
+    storageAccountName: strggrp2345678
+    azureResourceGroup: myRsGroup
+    packagePath: '$(Build.ArtifactStagingDirectory)'
+    deployScriptPath: 'deploy/**/scripts/windows/deploy.ps1'
