@@ -7,7 +7,7 @@ trigger:
 - master
 
 pool:
-  vmImage: 'vs2017-win2016'
+  vmImage: 'windows-latest'
 
 variables:
   buildConfiguration: 'Release'
@@ -58,3 +58,21 @@ steps:
     azureResourceGroup: myRsGroup
     packagePath: '$(Build.ArtifactStagingDirectory)'
     deployScriptPath: 'deploy/**/scripts/windows/deploy.ps1'
+- task: AzurePowerShell@5
+  inputs:
+    azureSubscription: 'Free Trial (2f72acfe-9510-43e3-aefe-055dea85635a)'
+    ScriptType: 'InlineScript'
+    Inline: |
+      # get the VMSS model
+      
+      $vmss = Get-AzureRmVmss -ResourceGroupName resource_group_name -VMScaleSetName VM_scale_set_name
+      
+      # set the new version in the model data
+      
+      $vmss.virtualMachineProfile.storageProfile.osDisk.image.uri="$(bakedImageUrl)"
+      
+      # update the virtual machine scale set model
+      
+      Update-AzureRmVmss -ResourceGroupName resource_group_name -Name resource_group_name -VirtualMachineScaleSet $vmss
+    FailOnStandardError: true
+    azurePowerShellVersion: 'LatestVersion'
